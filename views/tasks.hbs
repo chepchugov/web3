@@ -1,0 +1,110 @@
+<div class="container">
+    <div class="row">
+        {{!--<h3 class="center">{{title}}</h3>--}}
+        <div class="col m6 offset-m3 s12">
+            <div class="section">
+                <div class="row"><h5 class="center">Task list</h5></div>
+                <div class="row">
+                    <ul class="collection">
+                        {{#unless user.tasks}}
+                            <li class="collection-item">You have no tasks available</li>
+                        {{/unless}}
+                        {{#each user.tasks}}
+                            <li class="collection-item" data-task-id="{{_id}}">
+                                <div>
+                                    <a href="/tasks/{{_id}}">{{truncate title 20}}</a>
+                                    <label class="right">
+                                        <input type="checkbox" {{#if isDone}}checked{{/if}}>
+                                        <span>Done</span>
+                                    </label>
+                                </div>
+                            </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+            <div class="section">
+                <form>
+                    <div class="row"><h5 class="center">Create new task</h5></div>
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="task-title" name="title" type="text" required>
+                            <label for="task-title">Title</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <textarea id="task-description" class="materialize-textarea" name="description"></textarea>
+                            <label for="task-description">Description (optional)</label>
+                        </div>
+                    </div>
+                    <div class="row center">
+                        <button type="submit" class="waves-effect waves-light btn">
+                            <i class="material-icons right">create</i>
+                            <span>Create</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const pushTaskToCollection = task => {
+        $('.collection').append(`
+            <li class="collection-item" data-task-id="` + task._id + `">
+                <div>
+                    <a href="/tasks/` + task._id + `">` + truncate(task.title, 20) + `</a>
+                    <label class="right">
+                        <input type="checkbox">
+                        <span>Done</span>
+                    </label>
+                </div>
+            </li>
+        `);
+    };
+
+    $('form').submit(function (event) {
+        event.preventDefault();
+        const request = $.ajax({
+            url: '/tasks',
+            type: 'post',
+            data: $(this).serialize()
+        });
+        request.done(function (result) {
+            if (result.success) {
+                success('Task successfully created')
+                pushTaskToCollection(result.task);
+            } else {
+                switch (result.reason) {
+                    default:
+                        fail('Oops! Something went wrong');
+                }
+            }
+        });
+    });
+
+    $(document).on('change', '.collection-item input[type=checkbox]', function () {
+        const collectionItem = $(this).closest('.collection-item');
+        const id = collectionItem.data('task-id');
+        const isDone = this.checked;
+        const request = $.ajax({
+            url: `/tasks/${id}`,
+            type: 'patch',
+            contentType: 'application/json',
+            data: JSON.stringify({isDone: isDone})
+        });
+        request.done(function (result) {
+            if (result.success) {
+                if (result.task.isDone) {
+                    success('Task successfully marked as done');
+                } else {
+                    success('Task successfully marked as not done');
+                }
+            } else {
+                fail('Oops! Something went wrong');
+            }
+        });
+    });
+</script>

@@ -1,0 +1,172 @@
+<div class="container">
+    <div class="row">
+        {{!--<h3 class="center">{{title}}</h3>--}}
+        <div class="col m6 offset-m3 s12">
+            <div class="section">
+                <div class="row"><h5 class="center">Task</h5></div>
+                <form data-task-id="{{task._id}}">
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="task-title" name="title" type="text" value="{{task.title}}" disabled>
+                            <label for="task-title">Title</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <textarea id="task-description" class="materialize-textarea"
+                                      name="description" disabled>{{task.description}}</textarea>
+                            <label for="task-description">Description (optional)</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label>
+                            <input type="checkbox" {{#if task.isDone}}checked{{/if}}>
+                            <span>Done</span>
+                        </label>
+                    </div>
+                    <div class="row center">
+                        <button type="submit" class="waves-effect waves-light btn">
+                            <i class="material-icons right">delete</i>
+                            <span>Delete</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {{!--<div class="section">
+                <div class="row"><h5 class="center">Comments</h5></div>
+                <div class="row">
+                    {{#each task.comments}}
+                        <blockquote>{{message}}</blockquote>
+                    {{/each}}
+                </div>
+            </div>
+            <div class="section">
+                <form data-task-id="{{task._id}}">
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="comment-message" name="commentMessage" type="text" required>
+                            <label for="comment-message">Message</label>
+                        </div>
+                    </div>
+                    <div class="row center">
+                        <button type="submit" class="waves-effect waves-light btn">
+                            <i class="material-icons right">send</i>
+                            <span>Leave comment</span>
+                        </button>
+                    </div>
+                </form>
+            </div>--}}
+            <div class="section">
+                <div class="row"><h5 class="center">Comments</h5></div>
+                <div class="row">
+
+                </div>
+            </div>
+            <div class="section">
+                <form data-task-id="{{task._id}}">
+                    <div class="row center">
+                        <button type="submit" class="waves-effect waves-light btn">
+                            <i class="material-icons right">get_app</i>
+                            <span>Load comments</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const pushCommentToDiv = comment => {
+        $('.section:eq(1) .row:eq(1)').append(`
+            <blockquote>` + comment.message + `</blockquote>
+        `);
+    };
+
+    $('input[type=checkbox]').change(function () {
+        const isDone = this.checked;
+        const id = $(this).closest('form').data('task-id');
+        const request = $.ajax({
+            url: `/tasks/${id}`,
+            type: 'patch',
+            contentType: 'application/json',
+            data: JSON.stringify({isDone: isDone})
+        });
+        request.done(function (result) {
+            if (result.success) {
+                if (result.task.isDone) {
+                    success('Task successfully marked as done');
+                } else {
+                    success('Task successfully marked as not done');
+                }
+            } else {
+                fail('Oops! Something went wrong');
+            }
+        });
+    });
+
+    $('form:eq(0)').submit(function (event) {
+        event.preventDefault();
+        const id = $(this).data('task-id');
+        const request = $.ajax({
+            url: `/tasks/${id}`,
+            type: 'delete',
+            data: $(this).serialize()
+        });
+        request.done(function (result) {
+            if (result.success) {
+                location.replace('/tasks');
+            }
+        });
+    });
+
+    /*$('form:eq(1)').submit(function (event) {
+        event.preventDefault();
+        const id = $(this).data('task-id');
+        const request = $.ajax({
+            url: `/tasks/${id}`,
+            type: 'put',
+            data: $(this).serialize()
+        });
+        request.done(function (result) {
+            if (result.success) {
+                success('Comment successfully added');
+                pushCommentToDiv(result.comment);
+            } else {
+                switch (result.reason) {
+                    default:
+                        fail('Oops! Something went wrong');
+                }
+            }
+        });
+    });*/
+
+    /* Загрузка комментариев */
+    const clearComments = () => {
+        $('.section:eq(1) .row:eq(1)').html('');
+    }
+
+    $('form:eq(1)').submit(function (event) {
+        event.preventDefault();
+        const id = $(this).data('task-id');
+        const request = $.ajax({
+            url: `/list_comments/${id}`,
+            type: 'get',
+            data: $(this).serialize()
+        });
+        request.done(function (result) {
+            if (result.success) {
+                success('Comments successfully loaded');
+                clearComments();
+                for (const comment of result.comments) {
+                    pushCommentToDiv(comment);
+                }
+            } else {
+                switch (result.reason) {
+                    default:
+                        fail('Oops! Something went wrong');
+                }
+            }
+        });
+    });
+</script>

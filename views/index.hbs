@@ -1,0 +1,15 @@
+<div class="container">
+    <div class="row">
+        <div class="col m6 offset-m3 s12">
+            <h3 class="center">{{title}}</h3>
+            <div class="section">
+                {{#if user}}
+                    <p class="flow-text center">Now you can manage your tasks <a href="/tasks">here</a>.</p>
+                {{else}}
+                    <p class="flow-text center"><a href="/login">Log in</a> or <a href="/signup">sign up</a> to manage
+                        your tasks.</p>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>

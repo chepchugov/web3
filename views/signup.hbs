@@ -1,0 +1,57 @@
+<div class="container">
+    <div class="row">
+        <div class="col m6 offset-m3 s12">
+            <h3 class="center">{{title}}</h3>
+            <div class="section">
+                <form>
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="username" name="username" type="text" class="validate" maxlength="64"
+                                   pattern="{{usernamePattern}}" required>
+                            <label for="username">Username</label>
+                            <span class="helper-text">At least 4 letters, numbers, or underscores</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="password" name="password" type="password" class="validate" maxlength="64"
+                                   pattern="{{passwordPattern}}" required>
+                            <label for="password">Password</label>
+                            <span class="helper-text">At least 8 characters</span>
+                        </div>
+                    </div>
+                    <div class="row center">
+                        <button type="submit" class="waves-effect waves-light btn">
+                            <i class="material-icons right">create</i>
+                            <span>Sign up</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('form').submit(function (e) {
+        e.preventDefault();
+        const request = $.ajax({
+            url: '/signup',
+            type: 'post',
+            data: $(this).serialize()
+        });
+        request.done(function (result) {
+            if (result.success) {
+                location.replace('/');
+            } else {
+                switch (result.reason) {
+                    case 'UserExists':
+                        fail('A user with the given username is already registered');
+                        break;
+                    default:
+                        fail('Oops! Something went wrong');
+                }
+            }
+        });
+    });
+</script>

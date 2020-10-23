@@ -1,0 +1,26 @@
+<ul class="sidenav" id="mobile-demo">
+    <li {{#isIndexPage url}}class="active"{{/isIndexPage}}><a href="/">Home</a></li>
+    {{#if user}}
+        <li {{#isTasksPage url}}class="active"{{/isTasksPage}}><a href="/tasks">Tasks</a></li>
+        <li><a href="/logout">Log out</a></li>
+    {{else}}
+        <li {{#isSignUpPage url}}class="active"{{/isSignUpPage}}><a href="/signup">Sign up</a></li>
+        <li {{#isLogInPage url}}class="active"{{/isLogInPage}}><a href="/login">Log in</a></li>
+    {{/if}}
+</ul>
+<nav>
+    <div class="container nav-wrapper">
+        <a href="/" class="brand-logo">TODO</a>
+        <a data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+        <ul class="right hide-on-med-and-down">
+            <li {{#isIndexPage url}}class="active"{{/isIndexPage}}><a href="/">Home</a></li>
+            {{#if user}}
+                <li {{#isTasksPage url}}class="active"{{/isTasksPage}}><a href="/tasks">Tasks</a></li>
+                <li><a href="/logout">Log out</a></li>
+            {{else}}
+                <li {{#isLogInPage url}}class="active"{{/isLogInPage}}><a href="/login">Log in</a></li>
+                <li {{#isSignUpPage url}}class="active"{{/isSignUpPage}}><a href="/signup">Sign up</a></li>
+            {{/if}}
+        </ul>
+    </div>
+</nav>

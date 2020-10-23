@@ -1,0 +1,55 @@
+<div class="container">
+    <div class="row">
+        <div class="col m6 offset-m3 s12">
+            <h3 class="center">{{title}}</h3>
+            <div class="section">
+                <form>
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="username" name="username" type="text" class="validate"
+                                   maxlength="{{usernameMaxLength}}" required>
+                            <label for="username">Username</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="password" name="password" type="password" class="validate"
+                                   maxlength="{{passwordMaxLength}}" required>
+                            <label for="password">Password</label>
+                        </div>
+                    </div>
+                    <div class="row center">
+                        <button type="submit" class="waves-effect waves-light btn">
+                            <i class="material-icons right">login</i>
+                            <span>Log in</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('form').submit(function (event) {
+        event.preventDefault();
+        const request = $.ajax({
+            url: '/login',
+            type: 'post',
+            data: $(this).serialize()
+        });
+        request.done(function (result) {
+            if (result.success) {
+                location.replace("/");
+            } else {
+                switch (result.reason) {
+                    case 'IncorrectCredentials':
+                        fail('Username or password is incorrect');
+                        break;
+                    default:
+                        fail('Oops! Something went wrong');
+                }
+            }
+        });
+    });
+</script>
